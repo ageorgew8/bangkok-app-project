@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobility App Experiment</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/maps.css">
+    <link rel="stylesheet" href="css/moovit.css">
+    <link rel="stylesheet" href="css/viabus.css">
+    <link rel="stylesheet" href="css/grab.css">
+    <link rel="stylesheet" href="css/bolt.css">
+    </head>
+<body>
+
+    <div id="experiment-overlays">
+        
+        <div id="page-landing" class="overlay-page active">
+            <div class="content-box">
+                <h1>MaaS App Experiment</h1>
+                <p>Welcome to the mobility app experiment.</p>
+                <button class="flow-btn" onclick="Flow.nextStep()">Start Experiment</button>
+            </div>
+        </div>
+
+        <div id="page-consent" class="overlay-page">
+            <div class="content-box">
+                <h2>Consent Form</h2>
+                <div class="left-align">
+                    <p>The data obtained in this experiment will be used for research purposes only.</p>
+                    <p>No personally identifiable information will be collected.</p>
+                    <p>If you feel unwell during the experiment, please stop immediately.</p>
+                </div>
+                <label style="display:block; margin-top:15px;">
+                    <input type="checkbox" id="consent-check"> 
+                    I agree to the above and participate in the experiment.
+                </label>
+                <br>
+                <button class="flow-btn" onclick="Flow.checkConsent()">Next</button>
+            </div>
+        </div>
+
+        <div id="page-briefing" class="overlay-page">
+            <div class="content-box">
+                <h2>Experiment Overview</h2>
+                <p>You are a traveler in Bangkok.</p>
+                <p>You will be presented with 3 travel tasks (e.g., Go from Hotel to Temple).</p>
+                <p>Please freely use the apps on this smartphone to find the <b>best route</b> for each scenario.</p>
+                <button class="flow-btn" onclick="Flow.nextStep()">Next</button>
+            </div>
+        </div>
+
+        <div id="page-tutorial" class="overlay-page">
+            <div class="content-box">
+                <h2>Tutorial</h2>
+                <p>Use the navigation bar at the bottom.</p>
+                <div class="tutorial-icons">
+                    <span>◁ Back</span>
+                    <span>〇 Home</span>
+                    <span>□ Task & Answer</span>
+                </div>
+                <p>Press the "□" button to check the task instructions and submit your decision.</p>
+                <button class="flow-btn" onclick="Flow.startTaskPhase()">Start Task 1</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="smartphone-container">
+        
+        <div id="status-bar">
+            <span>12:30</span>
+            <span>🔋 100%</span>
+        </div>
+
+        <div id="screen">
+            <div id="home-screen" class="view active">
+                <div class="home-header">
+                    <p id="current-location-display">📍 Bangkok, TH</p>
+                </div>
+                <div class="app-grid">
+                    <div class="app-icon" data-app-id="google-map">
+                        <div class="icon-img google-map-icon">G</div>
+                        <span>Maps</span>
+                    </div>
+                    <div class="app-icon" data-app-id="moovit">
+                        <div class="icon-img moovit-icon">M</div>
+                        <span>Moovit</span>
+                    </div>
+                    <div class="app-icon" data-app-id="viabus">
+                        <div class="icon-img viabus-icon">V</div>
+                        <span>ViaBus</span>
+                    </div>
+                    <div class="app-icon" data-app-id="grab">
+                        <div class="icon-img grab-icon">Grab</div>
+                        <span>Grab</span>
+                    </div>
+                    <div class="app-icon" data-app-id="bolt">
+                        <div class="icon-img bolt-icon">Bolt</div>
+                        <span>Bolt</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="task-answer-screen" class="view app-screen" style="background: white; padding: 20px;">
+                <h2 style="margin-top:0;">Current Task</h2>
+                <div class="task-card" style="background:#f9f9f9; padding:15px; border-radius:10px; border:1px solid #ddd; margin-bottom:20px;">
+                    <h3 id="task-title-display" style="margin:0 0 10px 0; color:#333;">Task Title</h3>
+                    <p id="task-desc-display" style="font-size:14px; color:#555;">Task Description...</p>
+                </div>
+
+            <h3>Your Decision</h3>
+                <p>Which route will you take?</p>
+                <form id="answer-form">
+                    <label style="display:block; margin-bottom:5px; font-weight:bold;">Select Route:</label>
+                    
+                    <select id="answer-selection" style="width:100%; padding:12px; margin-bottom:20px; border-radius:8px; border:1px solid #ccc; font-size:16px;">
+                        <option value="" disabled selected>Select an option...</option>
+                        </select>
+
+                    <button type="button" class="action-btn" style="background:#333;" onclick="Flow.submitAnswer()">Submit & Next Task</button>
+                </form>
+            </div>
+            
+            <div id="google-map" class="view app-screen map-app-theme">
+                <div class="floating-search-bar" id="gmap-search-bar">
+                    <span class="g-icon">G</span>
+                    <input type="text" placeholder="Search here" readonly> <span class="mic-icon">🎤</span>
+                </div>
+                <div class="search-suggestions" id="gmap-suggestions">
+                    <div class="suggestion-item">
+                        <span class="clock-icon">🕒</span>
+                        <div class="text-group">
+                            <span class="sugg-title task-destination">Destination</span>
+                            <span class="sugg-desc">Recommended for you</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="map-google" class="map-container full-screen-map"></div>
+                <div class="bottom-sheet" id="gmap-bottom-sheet">
+                    <div class="sheet-handle"></div>
+                    <h3 class="task-destination">Destination Name</h3>
+                    <div id="gmap-route-list"></div>
+                </div>
+            </div>
+
+            <div id="moovit" class="view app-screen moovit-theme">
+                <div class="app-header orange-header">
+                    <p>Directions to:</p>
+                    <h3 class="destination-text task-destination">Destination</h3>
+                </div>
+                <div class="route-list" id="moovit-results"></div> 
+            </div>
+
+            <div id="viabus" class="view app-screen viabus-theme">
+                <div id="map-viabus" class="map-container"></div>
+                <div class="viabus-overlay">
+                    <div class="bus-info">
+                        <div class="bus-number" id="viabus-line">--</div>
+                        <div class="bus-status">
+                            <p>To: <span class="bold" id="viabus-dest">Destination</span></p>
+                            <p class="live-arrival" id="viabus-wait">Wait: -- min</p>
+                            <p style="font-size:12px; margin-top:4px;" id="viabus-status">Status...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="grab" class="view app-screen grab-theme">
+                <div class="grab-home-state" id="grab-home">
+                    <div class="grab-header">
+                        <div class="search-box-fake" id="grab-where-to">
+                            <span class="red-dot">●</span>
+                            <span class="placeholder-text">Where to?</span>
+                        </div>
+                    </div>
+                    <div class="grab-recent">
+                        <div class="recent-item">
+                            <span class="icon">🏢</span>
+                            <span class="task-destination">Destination</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grab-route-state" id="grab-booking" style="display:none;">
+                    <div class="top-nav">
+                        <button class="back-arrow" id="grab-back-arrow">←</button>
+                        <span class="task-destination">Transport</span>
+                    </div>
+                    <div id="map-grab" class="map-container half-height"></div>
+                    <div class="booking-panel">
+                        <div class="service-list">
+                            <div class="service-item selected">
+                                <span class="service-name">JustGrab</span>
+                                <span class="service-price grab-price">--- THB</span>
+                            </div>
+                            <div class="service-item">
+                                <span class="service-name">GrabBike</span>
+                                <span class="service-price grab-bike-price">--- THB</span>
+                            </div>
+                        </div>
+                        <button class="action-btn grab-btn">Book JustGrab</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="bolt" class="view app-screen bolt-theme">
+                
+                <div class="bolt-home-state" id="bolt-home">
+                     <div class="bolt-header">
+                        <div class="search-box-fake" id="bolt-search-input">
+                            <span class="green-dot">●</span>
+                            <span class="placeholder-text">Where to?</span>
+                        </div>
+                     </div>
+                     <div class="bolt-promo">
+                         <div class="recent-item">
+                            <span class="icon">🕒</span>
+                            <span class="task-destination">Destination</span>
+                         </div>
+                     </div>
+                </div>
+
+                <div class="bolt-route-state" id="bolt-booking" style="display:none;">
+                    <div class="top-nav">
+                        <button class="back-arrow" id="bolt-back-btn">←</button>
+                        <span>Bolt</span>
+                    </div>
+                    <div id="map-bolt" class="map-container half-height"></div>
+                    <div class="booking-panel">
+                        <h3>Choose a trip</h3>
+                        <div class="service-list">
+                            <div class="service-item">
+                                <span class="service-name">Bolt</span>
+                                <span class="service-price bolt-std-price">--- THB</span>
+                                <span class="eta">4 min</span>
+                            </div>
+                            <div class="service-item">
+                                <span class="service-name">Economy</span>
+                                <span class="service-price bolt-eco-price">--- THB</span>
+                                <span class="eta">8 min</span>
+                            </div>
+                        </div>
+                        <button class="action-btn bolt-btn">Select Bolt</button>
+                    </div>
+                </div>
+            </div>
+
+        <div id="nav-bar">
+            <button id="back-btn">◁</button>
+            <button id="home-btn">〇</button>
+            <button id="task-btn">☐</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script type="module" src="js/flow.js"></script> 
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+/* Bolt固有のホーム画面スタイル */
+.bolt-home-state {
+    padding: 20px;
+    background: #fff;
+    height: 100%;
+    /* Boltっぽい背景画像があればここに */
+}
+
+/* Grabと共通の見た目にするためのクラス定義 */
+.green-dot { color: #34D186; font-size: 18px; margin-right: 10px;}
+
+/* 以前のCSSで .grab-route-state { display: flex ... } と書いてある場合 */
+/* Boltも同様に縦並びにする必要があります */
+.bolt-route-state {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}

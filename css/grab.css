@@ -1,0 +1,47 @@
+/* Grab内だけのスタイル */
+/* Grab & Bolt Common */
+.booking-panel {
+    height: 50%; background: white; padding: 20px; box-sizing: border-box;
+    display: flex; flex-direction: column; gap: 10px;
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+}
+.service-item {
+    display: flex; justify-content: space-between; padding: 15px;
+    border: 1px solid #eee; border-radius: 8px; cursor: pointer;
+}
+.service-item.selected { border-color: #00B14F; background: #f0fcf4; }
+.action-btn {
+    width: 100%; padding: 15px; color: white; border: none; border-radius: 30px;
+    font-size: 18px; font-weight: bold; margin-top: auto; cursor: pointer;
+}
+
+/* Grab Specific */
+.grab-theme .action-btn { background: #00B14F; }
+.grab-theme .dot.green { color: #00B14F; }
+.grab-home-state {
+    padding: 20px;
+    background: #f0fcf4; /* Grab Green Light */
+    height: 100%;
+}
+.search-box-fake {
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    color: #555;
+    cursor: pointer;
+}
+.red-dot { color: #f03e3e; }
+.grab-route-state {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.top-nav {
+    height: 50px; background: white; display: flex; align-items: center; padding: 0 10px; z-index: 100;
+}
+.back-arrow { border: none; background: none; font-size: 20px; margin-right: 10px; }

@@ -1,0 +1,113 @@
+/* css/style.css */
+
+/* 基本的にすべての画面（ビュー）は隠す */
+.view {
+    display: none;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto; /* コンテンツが多い場合はスクロール */
+}
+
+/* activeクラスがついている画面だけ表示する */
+.view.active {
+    display: block;
+}
+
+/* その他のスタイル */
+body { margin: 0; background: #eee; font-family: sans-serif; display: flex; justify-content: center; height: 100vh; align-items: center;}
+#smartphone-container { width: 375px; height: 812px; background: white; position: relative; border: 12px solid #333; border-radius: 40px; overflow: hidden; display: flex; flex-direction: column; }
+#screen { 
+    flex: 1; 
+    position: relative; 
+        width: 100%;
+    height: 100%;
+    padding-bottom: 60px; /* ナビバーの高さ分だけ中身を押し上げる */
+    box-sizing: border-box;
+    overflow: hidden; 
+}
+.view {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto; /* スクロール可能に */
+    /* ナビバーとかぶらないよう、最後の余白を確保 */
+    padding-bottom: 60px; 
+    box-sizing: border-box;
+}
+#nav-bar {
+    position: absolute; /* 親要素に対して絶対配置 */
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #f8f8f8; /* 背景色を不透明にする（透けないように） */
+    border-top: 1px solid #ccc;
+    
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    
+    z-index: 2147483647; /* これ以上ないくらい大きな数値にして最前面へ */
+}
+#nav-bar button { font-size: 20px; background: none; border: none; cursor: pointer; }
+.app-grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center; }
+.app-icon { width: 70px; text-align: center; cursor: pointer; }
+.icon-img { width: 60px; height: 60px; border-radius: 12px; display: flex; justify-content: center; align-items: center; color: white; font-size: 24px; margin: 0 auto 5px; }
+
+/* アイコン色定義 */
+.google-map-icon { background: white; border: 1px solid #ddd; color: #DB4437; }
+.moovit-icon { background: #F04E23; }
+.viabus-icon { background: #1E2D53; color: #F8E71C; }
+.grab-icon { background: #00B14F; }
+.bolt-icon { background: #34D186; }
+
+/* css/style.css に追記 */
+
+/* 実験フロー用オーバーレイ */
+#experiment-overlays {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 999999; /* スマホよりさらに上 */
+    pointer-events: none; /* アクティブでない時はクリックを通す（念のため） */
+}
+
+.overlay-page {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); /* 背景を暗く */
+    display: none;
+    justify-content: center;
+    align-items: center;
+    pointer-events: auto; /* コンテンツはクリック可能 */
+}
+
+.overlay-page.active {
+    display: flex;
+}
+
+.content-box {
+    background: white;
+    width: 400px;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.content-box h1, .content-box h2 { margin-top: 0; color: #333; }
+.content-box p { color: #555; line-height: 1.6; margin-bottom: 20px; }
+.left-align { text-align: left; font-size: 14px; background: #f0f0f0; padding: 10px; border-radius: 5px;}
+
+.flow-btn {
+    background: #1a73e8; color: white;
+    border: none; padding: 12px 30px;
+    font-size: 16px; border-radius: 25px;
+    cursor: pointer; transition: background 0.3s;
+}
+.flow-btn:hover { background: #1557b0; }
+
+.tutorial-icons span {
+    display: inline-block; background: #eee; padding: 5px 10px;
+    margin: 0 5px; border-radius: 5px; font-weight: bold;
+}
