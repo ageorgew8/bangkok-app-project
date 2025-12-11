@@ -21,11 +21,13 @@ console.log("Current Participant ID:", participantId);
 
 // ログ送信関数 (これを他から呼び出す)
 export function sendLog(type, details = {}) {
-    // コンソールで確認用
-    console.log(`[LOG SENDING] ${type}`, details);
+const enrichedDetails = {
+        ...details,
+        client_timestamp: new Date().toISOString() // ミリ秒単位の正確な時刻
+    };
 
-    // GASに送信 (非同期)
-    // CORSエラー回避のため 'text/plain' で送り、mode: 'no-cors' は使わない(GAS側でJSON.parseするため)
+    console.log(`[LOG SENDING] ${type}`, enrichedDetails);
+
     fetch(GAS_URL, {
         method: 'POST',
         headers: {
@@ -34,7 +36,7 @@ export function sendLog(type, details = {}) {
         body: JSON.stringify({
             participantId: participantId,
             eventType: type,
-            details: details
+            details: enrichedDetails // 修正した詳細情報を送る
         })
     })
     .then(response => console.log("[LOG SENT] Success"))

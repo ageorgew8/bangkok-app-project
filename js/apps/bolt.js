@@ -1,78 +1,194 @@
 // js/apps/bolt.js
 
+import { dummyLocations } from '../data/locations.js';
+import { sendLog } from '../logger.js';
+
 let mapInstance = null;
-let currentTask = null;
 let routeLayers = [];
+let currentTask = null;
 
 export function initBolt() {
     console.log('Bolt Initialized');
 
-    const homeScreen = document.getElementById('bolt-home');
-    const bookingScreen = document.getElementById('bolt-booking');
-    const searchInput = document.getElementById('bolt-search-input'); // 入力欄
-    const backBtn = document.getElementById('bolt-back-btn');
+    const homeLayer = document.getElementById('bolt-home');
+    const searchLayer = document.getElementById('bolt-search');
+    const bookingLayer = document.getElementById('bolt-booking');
+    const searchTrigger = document.getElementById('bolt-search-trigger');
+    const searchBack = document.getElementById('bolt-search-back');
+    const bookingBack = document.getElementById('bolt-booking-back');
+    const realInput = document.getElementById('bolt-real-input');
+    const suggestions = document.getElementById('bolt-suggestions');
 
-    // 検索入力欄をタップした時
-    if (searchInput) {
-        searchInput.addEventListener('click', () => {
-            if (currentTask) {
-                if (homeScreen) homeScreen.style.display = 'none';
-                if (bookingScreen) bookingScreen.style.display = 'flex';
-                drawBoltRoute(currentTask);
-            }
+    // 1. ホーム -> 検索
+    if (searchTrigger) {
+        searchTrigger.addEventListener('click', () => {
+            homeLayer.style.display = 'none';
+            searchLayer.style.display = 'flex';
+            if(realInput) realInput.focus();
         });
     }
 
-    // 戻るボタン
-    if (backBtn) {
-        backBtn.addEventListener('click', () => {
-            if (bookingScreen) bookingScreen.style.display = 'none';
-            if (homeScreen) homeScreen.style.display = 'block';
+    // 2. 検索画面 -> ホームに戻る
+    if (searchBack) {
+        searchBack.addEventListener('click', () => {
+            searchLayer.style.display = 'none';
+            homeLayer.style.display = 'block'; // ホームを表示
+        });
+    }
+
+    // 3. 配車画面 -> ホームに戻る
+    if (bookingBack) {
+        bookingBack.addEventListener('click', () => {
+            bookingLayer.style.display = 'none';
+            homeLayer.style.display = 'block';
+        });
+    }
+
+    // 4. インクリメンタルサーチ
+    if (realInput) {
+        sendLog('input_start', { app: 'bolt' });
+        realInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            suggestions.innerHTML = '';
+            if (val.length === 0) return;
+
+            let candidates = [...dummyLocations];
+            
+            // ★修正: apps階層なし、destを使用
+            if (currentTask && currentTask.dest) candidates.unshift(currentTask.dest.name);
+
+            const filtered = candidates.filter(loc => loc.toLowerCase().includes(val));
+
+            filtered.forEach(name => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.style.padding = '15px';
+                div.style.borderBottom = '1px solid #eee';
+                div.innerHTML = `<span class="icon">📍</span> ${name}`;
+                
+                div.addEventListener('click', () => {
+                    // ★修正: destを使用
+                    if (currentTask && currentTask.dest && name === currentTask.dest.name) {
+                        sendLog('input_finish', { app: 'bolt', input: name });
+                        
+                        searchLayer.style.display = 'none';
+                        bookingLayer.style.display = 'flex';
+                        
+                        renderBoltServices();
+                        setTimeout(() => drawBoltRoute(currentTask), 100);
+                    } else {
+                        alert("Wrong destination.");
+                    }
+                });
+                suggestions.appendChild(div);
+            });
         });
     }
 }
 
 export function updateBolt(task) {
-    console.log('Bolt Updating');
     currentTask = task;
+    
+    const homeLayer = document.getElementById('bolt-home');
+    const searchLayer = document.getElementById('bolt-search');
+    const bookingLayer = document.getElementById('bolt-booking');
+    
+    if(homeLayer) homeLayer.style.display = 'block';
+    if(searchLayer) searchLayer.style.display = 'none';
+    if(bookingLayer) bookingLayer.style.display = 'none';
 
-    // リセット
-    const homeScreen = document.getElementById('bolt-home');
-    const bookingScreen = document.getElementById('bolt-booking');
-    if (homeScreen) homeScreen.style.display = 'block';
-    if (bookingScreen) bookingScreen.style.display = 'none';
+    if(document.getElementById('bolt-real-input')) {
+        document.getElementById('bolt-real-input').value = '';
+    }
+}
 
-    // 料金更新
-    const ecoPrice = document.querySelector('.bolt-eco-price');
-    const stdPrice = document.querySelector('.bolt-std-price');
+// ★ Boltリスト動的生成
+function renderBoltServices() {
+    const panel = document.querySelector('.bolt-vehicle-panel');
+    if (!panel) return;
 
-    if (ecoPrice && task.bolt) ecoPrice.innerText = task.bolt.eco;
-    if (stdPrice && task.bolt) stdPrice.innerText = task.bolt.standard;
+    // ★修正: currentTask.bolt を直接参照
+    const services = (currentTask && currentTask.bolt) ? currentTask.bolt : [];
+    
+    let htmlContent = `<h3>Choose a trip</h3>`;
+    
+    services.forEach((service, index) => {
+        // 1番目を選択状態っぽくする(CSS次第)
+        const isSelected = index === 0 ? 'selected-bolt' : ''; 
+        
+        htmlContent += `
+            <div class="vehicle-option ${isSelected}" data-index="${index}">
+                <div style="flex:1;">
+                    <span class="v-name">${service.type}</span>
+                    <span class="v-time" style="font-size:12px; color:#888; margin-left:5px;">${service.wait}</span>
+                </div>
+                <span class="v-price">${service.cost}</span>
+            </div>
+        `;
+    });
 
-    // 地図準備
-    if (!mapInstance) {
-        mapInstance = L.map('map-bolt', { zoomControl: false }).setView([task.origin.lat, task.origin.lng], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInstance);
+    // 最初のサービスのボタンを表示
+    const firstType = services.length > 0 ? services[0].type : 'Bolt';
+    htmlContent += `<button class="bolt-confirm-btn">Select ${firstType}</button>`;
+    
+    panel.innerHTML = htmlContent;
+
+    // イベント再登録
+    const options = panel.querySelectorAll('.vehicle-option');
+    const btn = panel.querySelector('.bolt-confirm-btn');
+    let selectedIdx = 0;
+
+    options.forEach((opt, idx) => {
+        opt.addEventListener('click', () => {
+            options.forEach(o => o.style.backgroundColor = 'transparent');
+            opt.style.backgroundColor = '#f0f9f4'; // 選択時の色
+            
+            selectedIdx = idx;
+            if(btn) btn.innerText = `Select ${services[idx].type}`;
+        });
+    });
+
+    if(btn) {
+        btn.addEventListener('click', () => {
+            const s = services[selectedIdx];
+            sendLog('result_sent', {
+                app: 'bolt',
+                selected_type: s.type,
+                cost: s.cost,
+                wait: s.wait
+            });
+            alert(`Booked ${s.type}!`);
+        });
     }
 }
 
 function drawBoltRoute(task) {
-    if (!mapInstance) return;
-    setTimeout(() => mapInstance.invalidateSize(), 100);
+    if(!task || !task.origin || !task.dest) return;
+    
+    const mapContainer = document.getElementById('map-bolt');
+    if(!mapContainer) return;
 
-    if (routeLayers.length > 0) {
+    if (!mapInstance) {
+        mapInstance = L.map('map-bolt', { zoomControl: false });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInstance);
+    }
+    
+    mapInstance.invalidateSize();
+
+    if(routeLayers.length > 0) {
         routeLayers.forEach(l => mapInstance.removeLayer(l));
         routeLayers = [];
     }
 
-    const originMarker = L.marker([task.origin.lat, task.origin.lng]).addTo(mapInstance);
-    const destMarker = L.marker([task.dest.lat, task.dest.lng]).addTo(mapInstance);
-
-    const routeLine = L.polyline([
+    const p1 = L.marker([task.origin.lat, task.origin.lng]).addTo(mapInstance);
+    // ★修正: destを使用
+    const p2 = L.marker([task.dest.lat, task.dest.lng]).addTo(mapInstance);
+    
+    const line = L.polyline([
         [task.origin.lat, task.origin.lng],
         [task.dest.lat, task.dest.lng]
-    ], { color: '#34D186', weight: 6 }).addTo(mapInstance); // Bolt Green
+    ], { color: '#34D186', weight: 6 }).addTo(mapInstance);
 
-    routeLayers.push(originMarker, destMarker, routeLine);
-    mapInstance.fitBounds(routeLine.getBounds(), { padding: [50, 100] });
+    routeLayers.push(p1, p2, line);
+    mapInstance.fitBounds(line.getBounds(), { padding: [30, 30] });
 }

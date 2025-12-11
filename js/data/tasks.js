@@ -1,224 +1,397 @@
-// js/data/tasks.js
+// js/tasks.js
 
 export const tasks = [
     {
         id: 0,
         title: "Task 1: Chula -> Siriraj Hospital",
-        description: "Constraints: Under 100 THB, Fastest. (Avoid Traffic)",
+        startTime: "12:00",
+        description: `
+Current Time: 12:00
+Scenario: You have a doctor's appointment at Siriraj Hospital at 13:00. You want to save money, but you cannot be late.
+Constraints: 
+1. Cost must be UNDER 100 THB.
+2. Choose the FASTEST route within the budget.
+
+---
+เวลาปัจจุบัน: 12:00
+สถานการณ์: คุณมีนัดพบแพทย์ที่โรงพยาบาลศิริราชตอน 13:00 น. คุณต้องการประหยัดค่าใช้จ่าย แต่ห้ามไปสาย
+เงื่อนไข:
+1. ค่าใช้จ่ายต้อง "ต่ำกว่า 100 บาท"
+2. เลือกเส้นทางที่ "เร็วที่สุด" ภายใต้งบประมาณนี้
+        `,
         origin: { lat: 13.7384, lng: 100.5315, name: "Chulalongkorn Univ." },
         dest:   { lat: 13.7593, lng: 100.4854, name: "Siriraj Hospital" },
-        
-        // --- App Data ---
-        
-        // Google Maps: 3 patterns (RH, MRT+Bus, Bus+Boat)
+
+        grab: [
+                { type: "JustGrab", cost: "THB 160", time: "", wait: "10 min" },
+                { type: "GrabBike", cost: "THB 105", time: "", wait: "3 min" }
+        ],
+        bolt: [
+                { type: "Bolt", cost: "THB 150", time: "", wait: "5 min" },
+                { type: "Bolt Bike", cost: "THB 110", time: "", wait: "2 min" }
+        ],
         google: {
             routes: [
                 {
                     type: "car",
-                    time: "40 min",
-                    cost: "250 THB",
-                    summary: "Taxi / Grab",
-                    details: "Fastest but expensive",
-                    tag: "Fastest"
+                    summary: "🚗 Car",
+                    details: "Moderate traffic",
+                    cost: "", 
+                    time: "35 min"
                 },
                 {
                     type: "transit",
-                    time: "55 min",
-                    cost: "40 THB",
-                    summary: "Bus + Boat",
-                    details: "Bus 47 -> Chao Phraya Express",
-                    tag: "Recommended"
+                    summary: "🚍Bus 529/4-28 → ⛴️Blue flag",
+                    details: "From 2 Kings Monument, 12:07",
+                    cost: "THB 35",
+                    time: "55 min"
                 },
                 {
                     type: "transit",
-                    time: "75 min",
-                    cost: "50 THB",
-                    summary: "MRT + Bus",
-                    details: "MRT Sam Yan -> Itsaraphap -> Bus 57"
+                    summary: "🚆MRT Blue → 🚍Bus 57/4-41",
+                    details: "From Sam Yan St., via Itsaraphap",
+                    cost: "THB 45",
+                    time: "70 min"
+                },
+                {
+                    type: "transit",
+                    summary: "🚍Bus 47/3-41 → 🚍Bus 509/4-60",
+                    details: "From Faculty of Education, 12:26",
+                    cost: "THB 25",
+                    time: "80 min"
+                },
+                {
+                    type: "walk",
+                    summary: "🚶 Walk only",
+                    details: "",
+                    cost: "",
+                    time: "120 min"
                 }
-            ]
+            ],
         },
 
-        // Moovit: Focus on Transit details
         moovit: {
             routes: [
                 {
-                    time: "55 min",
-                    summary: "Bus 47 + Orange Flag Boat",
-                    details: "Walk to Sam Yan -> Bus 47 -> Tha Chang Pier -> Boat",
-                    tag: "Best Value"
+                    summary: "🚍Bus 47/3-41 → 🚍Bus 509/4-60",
+                    details: "From Faculty of Education, 12:06",
+                    cost: "THB 25",
+                    time: "60 min"
                 },
                 {
-                    time: "75 min",
-                    summary: "MRT Blue Line + Bus",
-                    details: "Sam Yan Stn -> Itsaraphap Stn -> Bus 57",
-                    tag: ""
+                    summary: "🚆MRT Blue → ⛴️City Line",
+                    details: "From Sam Yan St., via Sanam Chai",
+                    cost: "THB 50",
+                    time: "50 min"
                 },
                 {
-                    time: "65 min",
-                    summary: "Bus Only (No. 47)",
-                    details: "Direct but heavy traffic area",
-                    tag: "Cheapest"
+                    summary: "🚍Bus M4 → 🚍Bus 91",
+                    details: "From Satit Patumwan, 12:20",
+                    cost: "THB 30",
+                    time: "55 min"
+                }
+            ],
+        },
+
+        viabus: {
+            stops: [
+                {
+                    id: "stop_edu_1",
+                    name: "Faculty of Education",
+                    lat: 13.73805, lng: 100.52943,
+                    lines: [
+                        { 
+                            number: "47/3-41", 
+                            color: "#d63031", 
+                            dest: "Pharachawang police sta.", 
+                            wait: "5 min", // On time
+                            busLat: 13.7375, busLng: 100.5295 
+                        }
+                    ]
+                },
+                {
+                    id: "stop_satit_1",
+                    name: "Satit Patumwan school",
+                    lat: 13.73924, lng: 100.53482,
+                    lines: [
+                        { 
+                            number: "M4", 
+                            color: "#6c5ce7", 
+                            dest: "Sanam Luang", 
+                            wait: "20 min", 
+                            busLat: 13.7425, busLng: 100.5315 
+                        }
+                    ]
+                },
+                {
+                    id: "2kings_1",
+                    name: "Two kings monument",
+                    lat: 13.73814, lng: 100.52971,
+                    lines: [
+                        { 
+                            number: "529/4-28", 
+                            color: "#0984e3", 
+                            dest: "Samae Dam", 
+                            wait: "7 min", 
+                            busLat: 13.7310, busLng: 100.5280 
+                        }
+                    ]
                 }
             ]
-        },
-
-        // ViaBus: Bus 47 approaching info
-        viabus: {
-            busLine: "47",
-            dest: "Tha Chang",
-            wait: "5 min", // Good connection
-            status: "Approaching Sam Yan"
-        },
-
-        // RH Apps: Expensive option
-        grab: { price: "250 THB", bike: "120 THB", wait: "4 min", time: "40 min" },
-        bolt: { standard: "230 THB", eco: "210 THB", wait: "8 min", time: "40 min" }
+        }
     },
-
     {
         id: 1,
         title: "Task 2: Chula -> Yaowarat (Chinatown)",
-        description: "Constraints: In 30 mins, Cheapest.",
-        origin: { lat: 13.7384, lng: 100.5315, name: "Chulalongkorn Univ." },
-        dest:   { lat: 13.7410, lng: 100.5085, name: "Yaowarat Road" },
+        startTime: "15:00",
+        description: `
+Current Time: 15:00
+Scenario: You are meeting friends for street food in Chinatown. They are already waiting, so you need to hurry, but you don't want to spend too much.
+Constraints:
+1. Duration must be UNDER 30 mins.
+2. Choose the CHEAPEST route within the time limit.
 
-        // Google Maps: RH is best here
-        google: {
+---
+เวลาปัจจุบัน: 15:00
+สถานการณ์: คุณมีนัดทานสตรีทฟู้ดกับเพื่อนที่เยาวราช เพื่อนๆ กำลังรออยู่ คุณจึงต้องรีบไป แต่ไม่อยากใช้เงินเยอะเกินไป
+เงื่อนไข:
+1. ใช้เวลาเดินทาง "น้อยกว่า 30 นาที"
+2. เลือกเส้นทางที่ "ถูกที่สุด" ภายใต้เวลาที่กำหนด
+        `,
+        origin: { lat: 13.7384, lng: 100.5315, name: "Chulalongkorn Univ." },
+        dest:   { lat: 13.7410, lng: 100.5085, name: "Yaowarat chinatown" },
+
+        grab: [
+            { type: "JustGrab", cost: "THB 120", time: "", wait: "5 min" },
+            { type: "GrabBike", cost: "THB 60", time: "", wait: "3 min" }
+        ],
+        bolt: [
+            { type: "Bolt", cost: "THB 100", time: "", wait: "7 min" },
+            { type: "Bolt Bike", cost: "THB 50", time: "", wait: "5 min" }
+        ],
+        google:{
             routes: [
                 {
                     type: "car",
-                    time: "20 min",
-                    cost: "90 THB",
-                    summary: "Ride Hailing",
-                    details: "Low traffic currently",
-                    tag: "Fastest & Cheap"
+                    summary: "🚗 Car",
+                    details: "Moderate traffic",
+                    cost: "",
+                    time: "20 min"
                 },
                 {
                     type: "transit",
-                    time: "40 min", // Delayed from 25min
-                    cost: "15 THB",
-                    summary: "Bus No. 21",
-                    details: "Delayed due to congestion",
-                    tag: "Delayed"
+                    summary: "🚍Bus 529/4-28",
+                    details: "From 2 Kings Monument, 15:05",
+                    cost: "THB 10",
+                    time: "25 min",
                 },
                 {
                     type: "transit",
-                    time: "35 min",
-                    cost: "20 THB",
-                    summary: "MRT Blue Line",
-                    details: "Sam Yan -> Wat Mangkon + Walk 5min"
+                    summary: "🚆MRT Blue",
+                    details: "From Sam Yan St.",
+                    cost: "THB 20",
+                    time: "35 min"
+                },
+                {
+                    type: "transit",
+                    summary: "🚍Bus 37/4-9",
+                    details: "From 2 Kings Monument, 15:10",
+                    cost: "THB 10",
+                    time: "35 min"
+                },
+                {
+                    type: "walk",
+                    summary: "🚶 Walk only",
+                    details: "",
+                    cost: "",
+                    time: "50 min"
                 }
-            ]
+            ],
         },
 
-        // Moovit
         moovit: {
-            routes: [
+            routes: [        
                 {
-                    time: "35 min",
-                    summary: "MRT Blue Line",
-                    details: "Sam Yan -> Wat Mangkon",
-                    tag: "Reliable"
+                    summary: "🚍Bus 529/4-28",
+                    details: "From 2 Kings Monument, 15:05",
+                    cost: "THB 10",
+                    time: "25 min",
                 },
                 {
-                    time: "40 min",
-                    summary: "Bus 21",
-                    details: "Wait 15 min + Travel 25 min",
-                    tag: "Warning: Delay"
+                    summary: "🚆MRT Blue",
+                    details: "From Sam Yan St.",
+                    cost: "THB 20",
+                    time: "35 min"
                 },
                 {
-                    time: "20 min",
-                    summary: "Grab / Taxi",
-                    details: "Direct drive",
-                    tag: "Fastest"
+                    summary: "🚍Bus 25",
+                    details: "From Chulalongkorn University, 15:15",
+                    cost: "THB 10",
+                    time: "30 min"
+                }
+            ],
+        },
+        viabus: {
+            stops: [
+                {
+                    id: "stop_chula_2",
+                    name: "Chulalongkorn University",
+                    lat: 13.7385, lng: 100.52947,
+                    lines: [
+                        { 
+                            number: "25", 
+                            color: "#e17055", 
+                            dest: "Tha Chang", 
+                            wait: "25 min (Delayed)", 
+                            busLat: 13.7420, busLng: 100.5330 // Farther away due to delay
+                        }
+                    ]
+                },
+
+                {
+                    id: "2kings_1",
+                    name: "Two Kings Monument", 
+                    lat: 13.73814, lng: 100.52971,
+                    lines: [
+                        { 
+                            number: "529/4-28", 
+                            color: "#d63031", 
+                            dest: "Samae Dam", 
+                            wait: "30 min (Delayed)", 
+                            busLat: 13.7600, busLng: 100.5150 // Very far
+                        },
+                        { 
+                            number: "37/4-9", 
+                            color: "#0984e3", 
+                            dest: "Phra Pradaeng", 
+                            wait: "12 min", 
+                            busLat: 13.7520, busLng: 100.5110 
+                        }
+                    ]
                 }
             ]
-        },
-
-        // ViaBus: Shows delay context
-        viabus: {
-            busLine: "21",
-            dest: "Wongwian Yai",
-            wait: "15 min", // Delayed
-            status: "Heavy Traffic at Rama 4"
-        },
-
-        // RH Apps: Cheap and Fast (Winner)
-        grab: { price: "90 THB", bike: "50 THB", wait: "3 min", time: "20 min" },
-        bolt: { standard: "75 THB", eco: "70 THB", wait: "6 min", time: "20 min" }
+        }
     },
-
     {
         id: 2,
-        title: "Task 3: Chula -> Chatuchak Market",
-        description: "Constraints: Rush Hour, Fastest. (Traffic Jam!)",
-        origin: { lat: 13.7384, lng: 100.5315, name: "Chulalongkorn Univ." },
-        dest:   { lat: 13.8016, lng: 100.5524, name: "Chatuchak Market" },
+        title: "Task 3: Chula -> Chatuchak Weekend Market",
+        startTime: "18:00",
+        description: `
+Current Time: 18:00 (Rush Hour)
+Scenario: You are going to Chatuchak Market for shopping. It is rush hour and traffic is very bad. You are tired and want to get there as soon as possible, regardless of the cost.
+Constraints:
+1. Choose the FASTEST route.
+2. Cost is NOT a concern.
 
-        // Google Maps: Traffic makes RH slow
+---
+เวลาปัจจุบัน: 18:00 (ชั่วโมงเร่งด่วน)
+สถานการณ์: คุณกำลังจะไปช้อปปิ้งที่ตลาดจตุจักร ตอนนี้เป็นเวลาเลิกงานและรถติดมาก คุณรู้สึกเหนื่อยและต้องการไปถึงให้เร็วที่สุดโดยไม่เกี่ยงราคา
+เงื่อนไข:
+1. เลือกเส้นทางที่ "เร็วที่สุด"
+2. "ไม่จำกัด" งบประมาณ
+        `,
+        origin: { lat: 13.7384, lng: 100.5315, name: "Chulalongkorn Univ." },
+        dest:   { lat: 13.8030, lng: 100.5528, name: "Chatuchak Market" },
+
+        grab: [
+            { type: "JustGrab", cost: "THB 300", time: "", wait: "15 min" },
+            { type: "GrabBike", cost: "THB 200", time: "", wait: "5 min" }
+        ],
+        bolt: [
+            { type: "Bolt", cost: "THB 200", time: "", wait: "10 min" },
+            { type: "Bolt Bike", cost: "THB 140", time: "", wait: "10 min" }
+        ],
         google: {
-            routes: [
-                {
-                    type: "transit",
-                    time: "40 min",
-                    cost: "44 THB",
-                    summary: "BTS Sukhumvit Line",
-                    details: "Siam -> Mo Chit",
-                    tag: "Fastest / No Traffic"
-                },
+            routes:[
                 {
                     type: "car",
-                    time: "60 min", // Traffic!
-                    cost: "300 THB",
-                    summary: "Taxi / Car",
-                    details: "Heavy traffic on Phaya Thai Rd",
-                    tag: "Slow"
+                    summary: "🚗 Car",
+                    details: "Heavy traffic",
+                    cost: "",
+                    time: "50 min"
                 },
                 {
                     type: "transit",
-                    time: "45 min",
-                    cost: "42 THB",
-                    summary: "MRT Blue Line",
-                    details: "Sam Yan -> Chatuchak Park"
+                    summary: "🚝BTS Sukhumvit",
+                    details: "From Siam St.",
+                    cost: "THB 47",
+                    time: "45 min"
+                },
+                {
+                    type: "transit",
+                    summary: "🚆MRT Blue",
+                    details: "From Sam Yan St.",
+                    cost: "THB 45",
+                    time: "55 min"
+                },
+                {
+                    type: "transit",
+                    summary: "🚍Bus 29/1-1",
+                    details: "From Chula Residence, 18:20",
+                    cost: "THB 15",
+                    time: "60 min"
+                },
+                {
+                    type: "walk",
+                    summary: "🚶 Walk only",
+                    cost: "",
+                    time: "120 min"
                 }
-            ]
+            ],
         },
-
-        // Moovit
         moovit: {
             routes: [
                 {
-                    time: "40 min",
-                    summary: "BTS Skytrain",
-                    details: "Walk to Siam -> BTS Mo Chit",
-                    tag: "Recommended"
+                    summary: "🚝BTS Sukhumvit",
+                    details: "From Siam St.",
+                    cost: "THB 47",
+                    time: "45 min"
                 },
                 {
-                    time: "45 min",
-                    summary: "MRT Subway",
-                    details: "Sam Yan -> Chatuchak Park",
-                    tag: "Good Alternative"
+                    summary: "🚆MRT Blue",
+                    details: "From Sam Yan St.",
+                    cost: "THB 45",
+                    time: "55 min"
                 },
                 {
-                    time: "70 min",
-                    summary: "Bus 29 / 34",
-                    details: "Very crowded / Traffic jam",
-                    tag: "Avoid"
+                    summary: "🚍Bus 34",
+                    details: "From Faculty of Education, 18:08",
+                    cost: "THB 15",
+                    time: "60 min",
                 }
-            ]
+            ],
         },
-
-        // ViaBus
         viabus: {
-            busLine: "29",
-            dest: "Rangsit",
-            wait: "20 min",
-            status: "Stuck in Traffic"
-        },
-
-        // RH Apps: Surge Pricing & Slow (Loser)
-        grab: { price: "320 THB", bike: "150 THB", wait: "10 min", time: "60 min" },
-        bolt: { standard: "280 THB", eco: "260 THB", wait: "15 min", time: "60 min" }
+            stops: [
+                {
+                    id: "stop_edu_3",
+                    name: "Faculty of Education",
+                    lat: 13.73805, lng: 100.52943,
+                    lines: [
+                        { 
+                            number: "34", 
+                            color: "#e17055", 
+                            dest: "Bang Khen", 
+                            wait: "20 min (Delayed)", 
+                            busLat: 13.7330, busLng: 100.5270 
+                        }
+                    ]
+                },
+                {
+                    id: "stop_residence_3",
+                    name: "Chulalongkorn uni. Residence",
+                    lat: 13.7411, lng: 100.52983,
+                    lines: [
+                        { 
+                            number: "29/1-1", 
+                            color: "#0984e3", 
+                            dest: "Bang Khen", 
+                            wait: "15 min", 
+                            busLat: 13.7310, busLng: 100.5250 
+                        }
+                    ]
+                },
+            ]
+        }
     }
 ];

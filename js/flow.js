@@ -43,7 +43,9 @@ window.Flow = {
         document.getElementById('experiment-overlays').style.display = 'none';
         
         // ★実験開始ログ
-        sendLog('experiment_start');
+        sendLog('experiment_start', { 
+            group_id: 'default' 
+        });
         
         currentTaskIndex = 0;
         updateTaskDisplay();
@@ -61,7 +63,6 @@ window.Flow = {
         // ★回答ログ送信 (ここが一番大事！)
         sendLog('task_answer', {
             taskId: currentTaskIndex,
-            taskTitle: tasks[currentTaskIndex].title,
             choice: selection
         });
 
@@ -70,6 +71,9 @@ window.Flow = {
         if (currentTaskIndex < totalTasks) {
             alert("Answer saved. Proceeding to next task.");
             updateTaskDisplay();
+            sendLog('Task_updated',{
+                taskId: currentTaskIndex
+            })
             dispatchTaskChangeEvent(currentTaskIndex);
             dispatchGoHomeEvent();
             setTimeout(() => { dispatchOpenTaskScreenEvent(); }, 500);
@@ -95,37 +99,46 @@ function updateTaskDisplay() {
     document.getElementById('task-title-display').innerText = task.title;
     document.getElementById('task-desc-display').innerText = task.description;
 
+    // ★ 1. 時計の更新 (HTMLに <span id="status-clock"> がある前提)
+    const clockEl = document.getElementById('status-clock');
+    if (clockEl && task.startTime) {
+        clockEl.innerText = task.startTime;
+    }
+
     // Generate Dropdown Options
     const select = document.getElementById('answer-selection');
     select.innerHTML = '<option value="" disabled selected>Select an option...</option>'; // Reset
 
-    // 1. Add Ride Hailing Options (Grab/Bolt)
-    if (task.grab) {
-        addOption(select, `Grab - ${task.grab.price}`);
-        addOption(select, `GrabBike - ${task.grab.bike}`);
-    }
-    if (task.bolt) {
-        addOption(select, `Bolt - ${task.bolt.standard}`);
-        addOption(select, `Bolt Economy - ${task.bolt.eco}`);
-    }
+    // ★ 2. Add Ride Hailing Options (Fixed List)
+    // tasks.js の type と文字列を合わせておくとログ分析が楽です
+    addOption(select, "Grab");
+    addOption(select, "GrabBike");
+    addOption(select, "Bolt");
+    addOption(select, "BoltBike");
 
-    // 2. Add Public Transport Options (from Google Routes)
+    // ★ 3. Add Public Transport & Walk (from Google Routes)
     if (task.google && task.google.routes) {
         task.google.routes.forEach(route => {
-            // "MRT + Bus (50 THB)" format
-            const label = `${route.summary} (${route.cost})`;
-            addOption(select, label);
+            // "car" は除外 (ユーザー指示: carとダブりを除く)
+            if (route.type === 'car') return;
+
+            // summaryを表示 (例: "🚍Bus 529/4-28 → ⛴️Blue flag")
+            // addOption側で重複チェックしているので、そのまま投げてOK
+            addOption(select, route.summary);
         });
     }
-
-    // 3. Add Other Options (from Moovit if different)
-    // For simplicity, we can rely on Google routes as the main public transit choices,
-    // or add unique ones from Moovit if needed.
-    // Here we just ensure we don't have duplicates if strings are identical.
+    if (task.moovit.routes) {
+        task.moovit.routes.forEach(route => {
+            // Moovitにcarが含まれている場合の保険 (通常はtransitのみですが念のため)
+            if (route.mode === 'car' || route.type === 'car') return;
+            
+            addOption(select, route.summary);
+        });
+    }
 }
 
 function addOption(selectElement, text) {
-    // Prevent duplicates (simple check)
+    // Prevent duplicates (Simple check)
     for (let i = 0; i < selectElement.options.length; i++) {
         if (selectElement.options[i].text === text) return;
     }
