@@ -20,6 +20,7 @@ body {
     padding: 12px; /* ベゼルの幅 */
     position: relative;
     z-index: 10;
+    margin-top: 0px;
     margin: auto;
 }
 
