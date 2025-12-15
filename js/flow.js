@@ -5,19 +5,16 @@ import { sendLog, getParticipantId } from './logger.js'; // ★インポート�
 
 // 状態管理
 let currentStageIndex = 0; // 0:Landing, 1:Consent, 2:Briefing, 3:Tutorial
-const overlayIds = ['page-landing', 'page-consent', 'page-briefing', 'page-tutorial'];
+const overlayIds = ['page-landing', 'page-consent', 'page-briefing', 'page-tutorial1', 'page-tutorial2', 'page-tutorial3'];
 let appOpenCount = 0;
 
 let currentTaskIndex = 0;
 const totalTasks = tasks.length;
 
-// ... (変数はそのまま) ...
-// GoogleフォームのURL (★ID事前入力用URLに書き換えること推奨)
 // 例: .../viewform?entry.123456=
 const googleFormBaseUrl = "https://docs.google.com/forms/d/e/1FAIpQLSc3mRrkDWH9X6wmCZBTRi-Jn_ltC-CD07omWht40d7CV_29Ig/viewform?usp=pp_url&entry.1025575642=1";
 
 window.Flow = {
-    // ... (nextStep, checkConsent はそのまま) ...
 
     nextStep: () => {
         // 現在のページを隠す
@@ -63,7 +60,7 @@ window.Flow = {
 
     submitAnswer: () => {
         if (appOpenCount === 0) {
-            alert("⚠️ Please use the apps (Maps, Grab, Bolt) to find the route before answering.\n\n(アプリを使ってルートを検索してから回答してください)");
+            alert("⚠️ Please use the apps (Maps, Grab, Bolt) to find the route before answering.");
             return; // ここで強制終了
         }
 

@@ -66,29 +66,61 @@
                         <span style="color:#666;">คุณจะพบกับ <strong>3 สถานการณ์การเดินทาง</strong> โปรดใช้แอปบนมือถือนี้เพื่อค้นหาเส้นทางที่เหมาะสมที่สุดตามเงื่อนไขที่กำหนด</span>
                     </p>
                 </div>
-                <button class="flow-btn" onclick="Flow.nextStep()">Next<br><small>ถัดไป</small></button>
+                <button class="flow-btn" onclick="Flow.nextStep()">Next</button>
             </div>
         </div>
 
-        <div id="page-tutorial" class="overlay-page">
+        <div id="page-tutorial1" class="overlay-page">
             <div class="content-box">
-                <h2>How to Control<br><small style="font-size:0.6em;">วิธีการใช้งาน</small></h2>
-                <p>Use the navigation bar at the bottom.<br><span style="color:#666; font-size:0.9em;">ใช้แถบนำทางด้านล่างเพื่อควบคุม</span></p>
+                <h2>How to Play</h2>
                 
-                <div class="tutorial-icons" style="margin: 20px 0; background:#eee; padding:10px; border-radius:10px;">
-                    <div style="margin-bottom:5px;"><strong>◁ Back</strong>: Go back <span style="color:#666;">(ย้อนกลับ)</span></div>
-                    <div style="margin-bottom:5px;"><strong>〇 Home</strong>: Home view <span style="color:#666;">(หน้าโฮม)</span></div>
-                    <div><strong>□ Task</strong>: Check Goal & Submit <span style="color:#666;">(ดูโจทย์ & ส่งคำตอบ)</span></div>
+                <div style="margin: 15px 0; border: 2px solid #ddd; border-radius: 10px; overflow: hidden;">
+                    <img src="img/demo1.png" alt="Demo" style="width: 100%; display: block;">
                 </div>
-                
-                <p style="font-size:0.9em; color:#d32f2f;">
-                    ⚠️ Important: After deciding a route, press the <strong>"□"</strong> button to submit your answer.<br>
-                    <span style="color:#666;">สำคัญ: หลังจากเลือกเส้นทางได้แล้ว ให้กดปุ่ม <strong>"□"</strong> เพื่อส่งคำตอบ</span>
+
+                <p style="font-size: 0.9em;">
+                    Check the destination and constraints of the task.
                 </p>
-                <button class="flow-btn" onclick="Flow.startTaskPhase()">Start Task 1<br><small>เริ่มภารกิจที่ 1</small></button>
+
+                <button class="flow-btn" onclick="Flow.nextStep()">Next</button>
+            </div>
+        </div>
+
+        <div id="page-tutorial2" class="overlay-page">
+            <div class="content-box">
+                <h2>How to Play</h2>
+                
+                <div style="margin: 15px 0; border: 2px solid #ddd; border-radius: 10px; overflow: hidden;">
+                    <img src="img/demo2.gif" alt="Demo" style="width: 100%; display: block;">
+                </div>
+
+                <p style="font-size: 0.9em;">
+                    Check apps to find the route options.<br>
+                    You can change apps with "〇 apps" button at the bottom.<br>
+                    You can check the task with "☐ task" button at the bottom.                
+                </p>
+
+                <button class="flow-btn" onclick="Flow.nextStep()">Next</button>
+            </div>
+        </div>
+        
+        <div id="page-tutorial3" class="overlay-page">
+            <div class="content-box">
+                <h2>How to Play</h2>
+                
+                <div style="margin: 15px 0; border: 2px solid #ddd; border-radius: 10px; overflow: hidden;">
+                    <img src="img/demo3.gif" alt="Demo" style="width: 100%; display: block;">
+                </div>
+
+                <p style="font-size: 0.9em;">
+                    When you decide the route, go "☐ task" and choose your route 
+                </p>
+
+                <button class="flow-btn" onclick="Flow.startTaskPhase()">Start Task 1</button>
             </div>
         </div>
     </div>
+
 
     <div id="smartphone-body">
         
