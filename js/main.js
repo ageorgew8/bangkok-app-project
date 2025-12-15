@@ -89,6 +89,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // ★アプリ起動ログ
                 sendLog('app_open', {appId: appId});
                 
+                if (window.Flow && window.Flow.notifyAppOpened) {
+                    window.Flow.notifyAppOpened();
+                }
                 updateAllApps();
                 showView(appId);
             };
@@ -101,13 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
         sendLog('home');
     });
 
-    
-    // 戻るボタンの挙動（簡易版）
-    document.getElementById('back-btn').addEventListener('click', () => {
-        // 今タスク画面ならホームへ、アプリならホームへ（単純化）
-        showView('home-screen');
-        sendLog('home');
-    });
 
     // ★重要: □ボタンで回答画面へ
     document.getElementById('task-btn').addEventListener('click', () => {

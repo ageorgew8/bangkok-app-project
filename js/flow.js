@@ -6,6 +6,7 @@ import { sendLog, getParticipantId } from './logger.js'; // ★インポート�
 // 状態管理
 let currentStageIndex = 0; // 0:Landing, 1:Consent, 2:Briefing, 3:Tutorial
 const overlayIds = ['page-landing', 'page-consent', 'page-briefing', 'page-tutorial'];
+let appOpenCount = 0;
 
 let currentTaskIndex = 0;
 const totalTasks = tasks.length;
@@ -39,6 +40,12 @@ window.Flow = {
         }
     },
 
+    // 2. カウントアップする関数を追加（main.jsから呼び出せるように）
+    notifyAppOpened: () => {
+        appOpenCount++;
+        console.log("App opened count:", appOpenCount);
+    },
+
     startTaskPhase: () => {
         document.getElementById('experiment-overlays').style.display = 'none';
         
@@ -48,12 +55,18 @@ window.Flow = {
         });
         
         currentTaskIndex = 0;
+        appOpenCount = 0;
         updateTaskDisplay();
         dispatchTaskChangeEvent(0);
         dispatchOpenTaskScreenEvent();
     },
 
     submitAnswer: () => {
+        if (appOpenCount === 0) {
+            alert("⚠️ Please use the apps (Maps, Grab, Bolt) to find the route before answering.\n\n(アプリを使ってルートを検索してから回答してください)");
+            return; // ここで強制終了
+        }
+
         const selection = document.getElementById('answer-selection').value;
         if (!selection) {
             alert("Please select a route.");
@@ -67,6 +80,7 @@ window.Flow = {
         });
 
         currentTaskIndex++;
+        appOpenCount = 0;
 
         if (currentTaskIndex < totalTasks) {
             alert("Answer saved. Proceeding to next task.");
